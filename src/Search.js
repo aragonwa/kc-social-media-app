@@ -13,7 +13,7 @@ export default class Search extends Component {
               className="form-control"
             />
             <span className="input-group-btn">
-              <button className="btn btn-success" type="button">
+              <button className="btn btn-success" type="button" onClick={this.props.toggleResults}>
                 Search
               </button>
             </span>
