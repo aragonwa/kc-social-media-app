@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { Modal } from 'react-bootstrap';
+import Select from 'react-select';
 
 class DeleteModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      account: null
+      accountName: '',
+      platforms: [],
+      categories: []
     };
     this.handleCancel = this.handleCancel.bind(this);
     this.deleteAccount = this.deleteAccount.bind(this);
@@ -18,7 +21,17 @@ class DeleteModal extends Component {
     ) {
       fetch('/api/' + this.props.id)
         .then(res => res.json())
-        .then(account => this.setState({ account: account }));
+        .then(account =>{
+          const platforms = account.platforms.map(platform => {
+            return platform.type;
+          });
+      
+          this.setState({
+            accountName: account.name,
+            platforms,
+            categories: account.categories
+          })
+        });
     }
   }
   deleteAccount(e) {
@@ -26,83 +39,45 @@ class DeleteModal extends Component {
     fetch('/api/' + this.props.id, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
-    // }).then(response => {
-      // return response.json();
-    }).then(response =>{
+    }).then(response => {
       this.props.deleteAccount(this.props.id);
       this.props.onHide();
-    })
+    });
   }
 
   handleCancel() {
-    this.setState({ account: null });
+    this.setState({ accountName: '',
+    platforms: [],
+    categories: [] });
     this.props.onHide();
   }
   render() {
     if (this.state.account === null) {
       return null;
     } else {
-      const networks = [
-        'facebook',
-        'twitter',
-        'wordpress',
-        'instgram',
-        'flickr',
-        'pintrest'
-      ];
-      const categories = ['transportation', 'public-safety'];
+      const platforms = this.props.platforms.map(platform => platform.name);
 
-      const accountNetworks = this.state.account.networks.map(network => {
-        return network.type;
+      const platformOptions = platforms.map(platform => {
+        return { value: platform, label: platform };
       });
-      const networkChecks = networks.map((network,i) => {
-        const isChecked = accountNetworks.indexOf(network) > -1 ? true : false;
-        return (
-          <label className="checkbox-inline" key={i}>
-            <input
-              readOnly
-              onChange={this.handleNetworksChange}
-              type="checkbox"
-              name="network"
-              id={'inlineCheckbox' + network}
-              value={network}
-              checked={isChecked}
-            />{' '}
-            {network}
-          </label>
-        );
-      });
-      const accountCategories = this.state.account.categories;
-      const categoryChecks = categories.map((category, i) => {
-        const isChecked =
-          accountCategories.indexOf(category) > -1 ? true : false;
-        return (
-          <label className="checkbox-inline" key={i}>
-            <input
-              readOnly
-              onChange={this.handleCategoriesChange}
-              type="checkbox"
-              id={'inlineCheckbox' + category}
-              value={category}
-              checked={isChecked}
-            />{' '}
-            {category}
-          </label>
-        );
+      const categories = this.props.categories.map(category => category.name);
+
+      const categoryOptions = categories.map(category => {
+        return { value: category, label: category };
       });
       return (
         <Modal show={this.props.show} onHide={this.props.onHide} bsSize="large">
           <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
+            <Modal.Title>Delete Account</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <form className="form-horizontal">
               <div className="form-group">
                 <label
                   htmlFor="inputAccountName"
-                  className="col-sm-2 control-label"
+                  className="col-sm-2"
                 >
-                  AccountName
+                  Name
                 </label>
                 <div className="col-sm-10">
                   <input
@@ -111,17 +86,33 @@ class DeleteModal extends Component {
                     className="form-control"
                     id="inputAccountName"
                     onChange={this.handleAccountNameChange}
-                    value={this.state.account.name}
+                    value={this.state.accountName}
                   />
                 </div>
               </div>
               <div className="form-group">
-                <div className="col-sm-2">Network</div>
-                <div className="col-sm-10">{networkChecks}</div>
+                <label className="col-sm-2">Platforms</label>
+                <div className="col-sm-10">
+                  <Select
+                    disabled={true}
+                    name="platformDropdown"
+                    value={this.state.platforms}
+                    multi
+                    options={platformOptions}
+                  />
+                </div>
               </div>
               <div className="form-group">
-                <div className="col-sm-2">Category</div>
-                <div className="col-sm-10">{categoryChecks}</div>
+                <label className="col-sm-2">Category</label>
+                <div className="col-sm-10">
+                  <Select
+                  disabled={true}
+                    name="categoryDropdown"
+                    value={this.state.categories}
+                    multi
+                    options={categoryOptions}
+                  />
+                </div>
               </div>
             </form>
           </Modal.Body>

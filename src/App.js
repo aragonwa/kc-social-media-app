@@ -4,7 +4,7 @@ import Search from './Search';
 import './App.css';
 import 'react-select/dist/react-select.css';
 import { alphaSort } from './utils/Filters';
-import { platforms, categories } from './db/data.js';
+import {getAccountsPlatformsCategories} from './utils/GetData'
 
 class App extends Component {
   constructor(props) {
@@ -12,35 +12,32 @@ class App extends Component {
     // TODO: Add platforms, categories
     this.state = {
       accounts: [],
+      platforms: [],
+      categories: [],
       filteredAccounts: [],
-      showResults: true,
       nameFilter: '',
       socialNetworkFilter: '',
       categoryFilter: ''
     };
-    // this.filterAccounts = this.filterAccounts.bind(this);
     this.filterOnName = this.filterOnName.bind(this);
     this.filterOnSocialNetwork = this.filterOnSocialNetwork.bind(this);
     this.filterOnCategory = this.filterOnCategory.bind(this);
   }
   componentDidMount() {
-    fetch('/api')
-      .then(res => res.json())
-      .then(accounts =>
-        this.setState({ accounts, filteredAccounts: accounts })
-      );
+    getAccountsPlatformsCategories().then(
+      ([accounts, platforms, categories]) => {
+        this.setState({
+          accounts,
+          platforms,
+          categories,
+          filteredAccounts: accounts
+        });
+      }
+    );
   }
+
   filterOnName(searchTerm) {
     this.setState({ nameFilter: searchTerm });
-    // if (!searchTerm) {
-    //   this.setState({ filteredAccounts: this.state.accounts });
-    // } else {
-    //   let filteredAccounts = this.state.filteredAccounts;
-    //   filteredAccounts = filteredAccounts.filter(account => {
-    //     return account.name.toLowerCase().includes(searchTerm);
-    //   });
-    //   this.setState({ filteredAccounts });
-    // }
   }
   filterOnSocialNetwork(searchTerm) {
     this.setState({ socialNetworkFilter: searchTerm });
@@ -48,24 +45,17 @@ class App extends Component {
   filterOnCategory(searchTerm) {
     this.setState({ categoryFilter: searchTerm });
   }
-  // filterAccounts() {
-  //   let filteredAccounts = this.state.filteredAccounts;
-  //   filteredAccounts = filteredAccounts.sort((a, b) => {
-  //     if (a.name < b.name) return -1;
-  //     if (a.name > b.name) return 1;
-  //     return 0;
-  //   });
-  //   this.setState({ filteredAccounts: filteredAccounts });
-  // }
-  // toggleResults() {
-  //   this.setState({ showResults: !this.state.showResults });
-  // }
   render() {
     // TODO: Move to seperate function/file
     let accounts = this.state.filteredAccounts;
 
     if (accounts.length === 0) {
-      return <div />;
+      return (
+        <div className="text-center">
+          <span className="fa fa-cog fa-spin fa-3x fa-fw" />
+          <span className="sr-only">Loading...</span>
+        </div>
+      );
     }
 
     if (
@@ -107,10 +97,10 @@ class App extends Component {
           filterOnName={this.filterOnName}
           filterOnSocialNetwork={this.filterOnSocialNetwork}
           filterOnCategory={this.filterOnCategory}
-          platforms={platforms}
-          categories={categories}
+          platforms={this.state.platforms}
+          categories={this.state.categories}
         />
-        <Results categories={categories} accounts={accounts} />
+        <Results platforms={this.state.platforms} categories={this.state.categories} accounts={accounts} />
       </div>
     );
   }

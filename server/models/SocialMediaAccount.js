@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 let Schema = mongoose.Schema;
 
-const NetworkSchema = new Schema({
+const PlatformsSchema = new Schema({
   type: {
     type: String,
     required: true
@@ -18,8 +18,8 @@ const socialMediaAccountSchema = new Schema({
     type: String,
     required: true
   },
-  networks: {
-    type: [NetworkSchema],
+  platforms: {
+    type: [PlatformsSchema],
     required: true
   },
   categories: [String]

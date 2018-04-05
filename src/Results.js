@@ -11,12 +11,12 @@ export default class Results extends Component {
           <table className="table table-striped table-bordered table-hover">
             <tbody>
               {this.props.accounts.map((account, i) => {
-                const networks = socialMediaPlatformSort(account.networks);
+                const platforms = socialMediaPlatformSort(account.platforms);
                 return (
                   <tr key={i}>
                     <td>{account.name}</td>
                     <td key={i}>
-                      {networks.map((network, i) => {
+                      {platforms.map((network, i) => {
                         return (
                           <span key={i} className="remove-link-underline">
                             <a href={network.url}>

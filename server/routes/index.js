@@ -16,7 +16,7 @@ const routes = SocialMediaAccount => {
 
       // Set the properties that came from the POST data
       socialMediaAccount.name = req.body.name;
-      socialMediaAccount.networks = req.body.networks;
+      socialMediaAccount.platforms = req.body.platforms;
       socialMediaAccount.categories = req.body.categories;
 
       // Save the socialMediaAccount and check for errors
@@ -46,7 +46,7 @@ const routes = SocialMediaAccount => {
     })
     .put((req, res) => {
       req.account.name = req.body.name;
-      req.account.networks = req.body.networks;
+      req.account.platforms = req.body.platforms;
       req.account.categories = req.body.categories;
       req.account.save(function(err) {
         if (err) res.send(err);
