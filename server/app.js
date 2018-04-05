@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const SocialMediaAccount = require('./models/SocialMediaAccount');
+const Platforms = require('./models/Platforms');
+const Categories = require('./models/Categories');
 
 const url = 'mongodb://localhost:27017/kc_accounts';
 // const url = 'mongodb://alex:alex@ds051750.mlab.com:51750/node';
@@ -17,6 +19,8 @@ mongoose.connect(url, function(err, db) {
 });
 
 var router = require('./routes/index');
+var platformRouter = require('./routes/platforms');
+var categoriesRouter = require('./routes/categories');
 
 var app = express();
 
@@ -25,7 +29,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use('/api/platforms', platformRouter(Platforms));
+app.use('/api/categories', categoriesRouter(Categories));
 app.use('/api', router(SocialMediaAccount));
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
